@@ -8,7 +8,7 @@ pub use gfx_hal::pso::{
     DescriptorType, ImageDescriptorType,
 };
 
-const DESCRIPTOR_TYPES_COUNT: usize = 11;
+const DESCRIPTOR_TYPES_COUNT: usize = 12;
 
 const DESCRIPTOR_TYPES: [DescriptorType; DESCRIPTOR_TYPES_COUNT] = [
     DescriptorType::Sampler,
@@ -21,7 +21,10 @@ const DESCRIPTOR_TYPES: [DescriptorType; DESCRIPTOR_TYPES_COUNT] = [
         },
     },
     DescriptorType::Image {
-        ty: ImageDescriptorType::Storage,
+        ty: ImageDescriptorType::Storage { read_only: false },
+    },
+    DescriptorType::Image {
+        ty: ImageDescriptorType::Storage { read_only: true },
     },
     DescriptorType::Buffer {
         ty: BufferDescriptorType::Storage { read_only: false },
@@ -70,47 +73,51 @@ fn descriptor_type_index(ty: &DescriptorType) -> usize {
             },
         } => 2,
         DescriptorType::Image {
-            ty: ImageDescriptorType::Storage,
+            ty: ImageDescriptorType::Storage { read_only: false },
         } => 3,
-        DescriptorType::Buffer {
-            ty: BufferDescriptorType::Storage { read_only: _ },
-            format:
-                BufferDescriptorFormat::Structured {
-                    dynamic_offset: true,
-                },
+        DescriptorType::Image {
+            ty: ImageDescriptorType::Storage { read_only: true },
         } => 4,
         DescriptorType::Buffer {
-            ty: BufferDescriptorType::Uniform,
+            ty: BufferDescriptorType::Storage { read_only: _ },
             format:
                 BufferDescriptorFormat::Structured {
                     dynamic_offset: true,
                 },
         } => 5,
         DescriptorType::Buffer {
-            ty: BufferDescriptorType::Storage { read_only: _ },
+            ty: BufferDescriptorType::Uniform,
             format:
                 BufferDescriptorFormat::Structured {
-                    dynamic_offset: false,
+                    dynamic_offset: true,
                 },
         } => 6,
         DescriptorType::Buffer {
-            ty: BufferDescriptorType::Uniform,
+            ty: BufferDescriptorType::Storage { read_only: _ },
             format:
                 BufferDescriptorFormat::Structured {
                     dynamic_offset: false,
                 },
         } => 7,
         DescriptorType::Buffer {
+            ty: BufferDescriptorType::Uniform,
+            format:
+                BufferDescriptorFormat::Structured {
+                    dynamic_offset: false,
+                },
+        } => 8,
+        DescriptorType::Buffer {
             ty: BufferDescriptorType::Storage { read_only: _ },
             format: BufferDescriptorFormat::Texel,
-        } => 8,
+        } => 9,
         DescriptorType::Buffer {
             ty: BufferDescriptorType::Uniform,
             format: BufferDescriptorFormat::Texel,
-        } => 9,
-        DescriptorType::InputAttachment => 10,
+        } => 10,
+        DescriptorType::InputAttachment => 11,
     }
 }
+
 
 /// Number of descriptors per type.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

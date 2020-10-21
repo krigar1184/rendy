@@ -3,7 +3,7 @@ pub(crate) mod write;
 
 use {
     crate::{memory::Memory, util::*},
-    gfx_hal::{device::Device as _, Backend},
+    gfx_hal::{device::Device as _, Backend, memory::Segment},
     std::{ops::Range, ptr::NonNull},
 };
 
@@ -177,11 +177,12 @@ where
 
         if !self.coherent.0 {
             let aligned_sub_range = align_range(sub_range, self.memory.non_coherent_atom_size());
+            let segment = Segment { offset: aligned_sub_range.start, size: Some(aligned_sub_range.end) };
             debug_assert!(is_sub_range(
                 self.mapping_range.clone(),
                 aligned_sub_range.clone()
             ));
-            device.invalidate_mapped_memory_ranges(Some((self.memory.raw(), aligned_sub_range)))?;
+            device.invalidate_mapped_memory_ranges(Some((self.memory.raw(), segment)))?;
         }
 
         let slice = mapped_slice::<T>(ptr, size);
@@ -225,13 +226,15 @@ where
         let ref memory = self.memory;
         let flush = if !self.coherent.0 {
             let aligned_sub_range = align_range(sub_range, self.memory.non_coherent_atom_size());
+            let segment = Segment { offset: aligned_sub_range.start, size: Some(aligned_sub_range.end) };
             debug_assert!(is_sub_range(
                 self.mapping_range.clone(),
                 aligned_sub_range.clone()
             ));
+
             Some(move || {
                 device
-                    .flush_mapped_memory_ranges(Some((memory.raw(), aligned_sub_range)))
+                    .flush_mapped_memory_ranges(Some((memory.raw(), segment)))
                     .expect("Should flush successfully");
             })
         } else {

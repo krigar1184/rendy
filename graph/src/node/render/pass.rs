@@ -858,7 +858,7 @@ where
                             framebuffer_width,
                             framebuffer_height,
                             rendy_core::hal::pass::Subpass {
-                                index,
+                                index: index as u8,
                                 main_pass: &render_pass,
                             },
                             buffers,
@@ -1168,7 +1168,7 @@ where
                                         queue.id(),
                                         index,
                                         rendy_core::hal::pass::Subpass {
-                                            index: subpass_index,
+                                            index: subpass_index as u8,
                                             main_pass: &render_pass,
                                         },
                                         aux,
@@ -1219,7 +1219,7 @@ where
                                     pass_encoder.reborrow(),
                                     index,
                                     rendy_core::hal::pass::Subpass {
-                                        index: subpass_index,
+                                        index: subpass_index as u8,
                                         main_pass: &render_pass,
                                     },
                                     aux,
@@ -1350,7 +1350,7 @@ where
                                     queue.id(),
                                     index,
                                     rendy_core::hal::pass::Subpass {
-                                        index: subpass_index,
+                                        index: subpass_index as u8,
                                         main_pass: &render_pass,
                                     },
                                     aux,
@@ -1392,7 +1392,7 @@ where
                                 pass_encoder.reborrow(),
                                 index,
                                 rendy_core::hal::pass::Subpass {
-                                    index: subpass_index,
+                                    index: subpass_index as u8,
                                     main_pass: &render_pass,
                                 },
                                 aux,

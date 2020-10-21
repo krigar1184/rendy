@@ -10,7 +10,10 @@ use crate::{
     resource::{Buffer, BufferInfo, Escape},
     AsVertex, VertexFormat,
 };
-use rendy_core::hal::adapter::PhysicalDevice;
+use rendy_core::hal::{
+    adapter::PhysicalDevice,
+    buffer::SubRange,
+};
 use std::{borrow::Cow, mem::size_of};
 
 /// Vertex buffer with it's format

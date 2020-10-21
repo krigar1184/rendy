@@ -13,7 +13,11 @@ use {
         wsi::SwapchainError,
         BufferId, ImageId, NodeId,
     },
-    rendy_core::hal::{queue::QueueFamilyId, Backend},
+    rendy_core::hal::{
+        queue::QueueFamilyId,
+        buffer::SubRange,
+        Backend,
+    },
 };
 
 /// Buffer access node will perform.
@@ -282,7 +286,7 @@ pub enum NodeBuildError {
     /// Mismatched or unsupported queue family.
     QueueFamily(FamilyId),
     /// Failed to create an imate view.
-    View(rendy_core::hal::image::ViewError),
+    View(rendy_core::hal::image::ViewCreationError),
     /// Failed to create a pipeline.
     Pipeline(rendy_core::hal::pso::CreationError),
     /// Failed to create a swap chain.
@@ -515,6 +519,7 @@ pub fn gfx_acquire_barriers<'a, 'b, B: Backend>(
             buffer.acquire.as_ref().map(|acquire| {
                 bstart |= acquire.stages.start;
                 bend |= acquire.stages.end;
+                let subrange = SubRange { offset: buffer.range.start, size: Some(buffer.range.end) };
 
                 rendy_core::hal::memory::Barrier::Buffer {
                     states: acquire.states.clone(),
@@ -523,7 +528,7 @@ pub fn gfx_acquire_barriers<'a, 'b, B: Backend>(
                         .get_buffer(buffer.id)
                         .expect("Buffer does not exist")
                         .raw(),
-                    range: Some(buffer.range.start)..Some(buffer.range.end),
+                    range: subrange,
                 }
             })
         })
@@ -567,6 +572,7 @@ pub fn gfx_release_barriers<'a, B: Backend>(
                 bstart |= release.stages.start;
                 bend |= release.stages.end;
 
+                let subrange = SubRange { offset: buffer.range.start, size: Some(buffer.range.end) };
                 rendy_core::hal::memory::Barrier::Buffer {
                     states: release.states.clone(),
                     families: release.families.clone(),
@@ -574,7 +580,7 @@ pub fn gfx_release_barriers<'a, B: Backend>(
                         .get_buffer(buffer.id)
                         .expect("Buffer does not exist")
                         .raw(),
-                    range: Some(buffer.range.start)..Some(buffer.range.end),
+                    range: subrange,
                 }
             })
         })

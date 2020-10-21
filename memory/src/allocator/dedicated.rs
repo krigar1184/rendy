@@ -8,7 +8,7 @@ use {
         memory::*,
         util::*,
     },
-    gfx_hal::{device::Device as _, Backend},
+    gfx_hal::{device::Device as _, Backend, memory::Segment},
 };
 
 /// Memory block allocated from `DedicatedAllocator`
@@ -96,7 +96,8 @@ where
                 ))
             } else {
                 self.unmap(device);
-                let ptr = device.map_memory(self.memory.raw(), mapping_range.clone())?;
+                let segment = Segment { offset: mapping_range.start, size: Some(mapping_range.end) };
+                let ptr = device.map_memory(self.memory.raw(), segment)?;
                 let ptr = NonNull::new(ptr).expect("Memory mapping shouldn't return nullptr");
                 let mapping =
                     MappedRange::from_raw(&self.memory, ptr, mapping_range, requested_range);

@@ -10,7 +10,10 @@ use {
         CreationError,
     },
     relevant::Relevant,
-    rendy_core::hal::{device::Device as _, format, Backend},
+    rendy_core::hal::{
+        device::Device as _, format, Backend,
+        image::ViewCreationError,
+    },
 };
 
 /// Image info.
@@ -216,7 +219,7 @@ pub struct ImageView<B: Backend> {
 
 device_owned!(ImageView<B> @ |view: &Self| view.image.device_id());
 /// Alias for the error to create an image view.
-pub type ImageViewCreationError = CreationError<ViewError>;
+pub type ImageViewCreationError = CreationError<ViewCreationError>;
 
 impl<B> ImageView<B>
 where

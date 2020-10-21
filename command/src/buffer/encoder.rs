@@ -10,6 +10,7 @@ use {
         capability::{Capability, Compute, Graphics, Supports, Transfer},
         family::FamilyId,
     },
+    rendy_core::hal::buffer::{SubRange, IndexBufferView},
 };
 
 /// Draw command for [`draw_indirect`].
@@ -104,9 +105,9 @@ where
         self.capability.assert();
         rendy_core::hal::command::CommandBuffer::bind_index_buffer(
             self.raw,
-            rendy_core::hal::buffer::IndexBufferView {
-                buffer: buffer,
-                offset,
+            IndexBufferView {
+                buffer,
+                range: SubRange { offset, size: None },
                 index_type,
             },
         )
@@ -137,7 +138,7 @@ where
         rendy_core::hal::command::CommandBuffer::bind_vertex_buffers(
             self.raw,
             first_binding,
-            buffers,
+            buffers.into_iter().map(|(buffer, offset)| (buffer, SubRange { offset, size: None })),
         )
     }
 
